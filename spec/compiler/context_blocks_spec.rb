@@ -103,4 +103,25 @@ describe Curly::Compiler do
       render('{{#tree:branch}}{{/branch}}{{/tree}}')
     end.to raise_exception(Curly::IncorrectEndingError)
   end
+
+  it "keeps the same context for shorthand conditionals" do
+    define_presenter do
+      def item(&block)
+        block.call(hello: "world")
+      end
+    end
+
+    define_presenter "ItemPresenter" do
+      presents :item
+      def hello?
+        @item[:hello]
+      end
+
+      def value
+        @item[:hello]
+      end
+    end
+
+    render("{{#item:hello?}}{{item:value}}{{/item:hello?}}").should == "world"
+  end
 end
